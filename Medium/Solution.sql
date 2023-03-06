@@ -165,3 +165,5 @@ CASE
 	WHEN gender = 'M' THEN 'MALE' ELSE 'FEMALE'
 END AS gender_type
 FROM patients
+
+-----THE END-----------------------------
