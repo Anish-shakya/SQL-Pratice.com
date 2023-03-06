@@ -61,7 +61,7 @@ ORDER BY total_patient desc , city asc
 ---10.	Show first name, last name and role of every person that is either patient or doctor.
 ---The roles are either "Patient" or "Doctor"
 SELECT first_name,last_name,'Patient' AS role FROM patients
-union all 
+UNION ALL
 SELECT first_name,last_name,'Doctor' As role FROM doctors
 
 ---11.	Show all allergies ordered by popularity. Remove 'NKA' and NULL values FROM query.
@@ -79,7 +79,7 @@ ORDER BY birth_date
 
 ---13.	We want to display each patient's full name in a single column. Their last_name in all upper letters must appear first, then first_name in all lower case letters. Separate the last_name and first_name with a comma. Order the list by the first_name in decending order
 ---EX: SMITH,jane
-SELECT concat(upper(last_name),',',lower(first_name)) AS new_name_format
+SELECT CONCAT(upper(last_name),',',lower(first_name)) AS new_name_format
 FROM patients
 ORDER BY first_name desc
 
@@ -126,10 +126,42 @@ GROUP BY d.first_name,d.last_name
 
 
 ---20)For each doctor, display their id, full name, and the first and last admission date they attended.
-SELECT d.doctor_id,concat(d.first_name,' ',d.last_name) AS full_name,
+SELECT d.doctor_id,CONCAT(d.first_name,' ',d.last_name) AS full_name,
 	MIN(admission_date) As first_admission_date ,MAX(admission_date) AS last_admission_date
 FROM admissions a 
 JOIN doctors d ON a.attending_doctor_id = d.doctor_id
 GROUP BY d.doctor_id
 
+---- 21)Display the total amount of patients for each province. Order by descending.
+SELECT n.province_name,count(DISTINCT(p.patient_id)) AS total_patients
+FROM patients p 
+JOIN province_names n ON p.province_id = n.province_id
+GROUP BY n.province_name 
+ORDER BY total_patients DESC
 
+
+---- 22)For every admission, display the patient's full name, their admission diagnosis, and their doctor's full name who diagnosed their problem.
+SELECT CONCAT(p.first_name,' ',p.last_name) AS patient_name,a.diagnosis,
+	   CONCAT(d.first_name,' ',d.last_name) AS doctor_name
+FROM patients p 
+JOIN admissions a ON p.patient_id = a.patient_id
+JOIN doctors d ON a.attending_doctor_id = d.doctor_id
+
+---- 23) display the number of duplicate patients based on their first_name and last_name.
+SELECT first_name,last_name,count(*) AS num_of_duplication
+FROM patients
+GROUP BY first_name,last_name
+HAVING count(*) > 1
+
+
+-----24) Display patient's full name,height in the units feet rounded to 1 decimal,weight in the unit pounds rounded to 0 decimals,
+-----birth_date,gender non abbreviated.
+-----Convert CM to feet by dividing by 30.48.
+-----Convert KG to pounds by multiplying by 2.205.
+SELECT CONCAT(first_name,' ',last_name) AS patient_name ,
+ROUND((height/30.48),1) AS height,
+ROUND((weight*2.205),0) AS weight,birth_date,
+CASE 
+	WHEN gender = 'M' THEN 'MALE' ELSE 'FEMALE'
+END AS gender_type
+FROM patients
