@@ -166,4 +166,4 @@ CASE
 END AS gender_type
 FROM patients
 
------THE END-----------------------------
+
